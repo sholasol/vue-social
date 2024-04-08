@@ -1,34 +1,42 @@
 <script setup>
-import TextInput from "@/Components/TextInput.vue";
-import { ref } from "vue";
-import FollowingItem from "@/Components/app/FollowingItem.vue";
-
-const searchKeyword = ref("");
+import FollowingListItems from "@/Components/app/FollowingListItems.vue";
+import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/vue";
 </script>
 
 <template>
-    <div class="px-3 bg-white rounded border py-3">
-        <h2 class="text-xl font-bold px-3 mb-4">My Followings</h2>
-        <TextInput
-            :model-value="searchKeyword"
-            placeholder="search group"
-            class="w-full"
-        />
-        <div class="py-8 px-3">
-            <div v-if="false" class="text-gray-600 flex text-center">
-                You don't have friends yet
-            </div>
-            <div v-else>
-                <FollowingItem
-                    image="https://picsum.photos/100"
-                    title="John Doe"
-                />
+    <div class="px-3 bg-white rounded border h-full py-3 overflow-hidden">
+        <div class="block lg:hidden">
+            <Disclosure v-slot="{ open }">
+                <DisclosureButton class="w-full">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-xl font-bold px-3">My Followings</h2>
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="currentColor"
+                            class="w-6 h-6 transition-all"
+                            :class="open ? 'rotate-90 transform' : ''"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                            />
+                        </svg>
+                    </div>
+                </DisclosureButton>
 
-                <FollowingItem
-                    image="https://picsum.photos/100"
-                    title="Elon Musk"
-                />
-            </div>
+                <DisclosurePanel>
+                    <FollowingListItems />
+                </DisclosurePanel>
+            </Disclosure>
+        </div>
+
+        <div class="h-full flex-col overflow-hidden hidden lg:flex">
+            <h2 class="text-xl font-bold px-3">My Followings</h2>
+            <FollowingListItems />
         </div>
     </div>
 </template>

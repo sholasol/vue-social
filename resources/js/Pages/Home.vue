@@ -27,7 +27,7 @@ defineProps({
     <Head title="LaraVue Social App" />
 
     <div class="grid lg:grid-cols-12 gap-3 p-4 h-full">
-        <div class="lg:col-span-3 py-2 lg:order-1 h-full overflow-auto">
+        <div class="lg:col-span-3 py-2 lg:order-1 h-full overflow-hidden">
             <GroupList />
         </div>
 
@@ -35,9 +35,11 @@ defineProps({
             <FollowingList />
         </div>
 
-        <div class="lg:col-span-6 py-2 lg:order-2 h-full overflow-auto">
+        <div
+            class="lg:col-span-6 py-2 lg:order-2 h-full overflow-hidden flex flex-col"
+        >
             <CreatePost />
-            <PostList />
+            <PostList class="flex-1" />
         </div>
     </div>
 </template>

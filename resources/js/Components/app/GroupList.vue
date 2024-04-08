@@ -1,77 +1,43 @@
 <script setup>
-import GroupItem from "@/Components/app/GroupItem.vue";
-import TextInput from "@/Components/TextInput.vue";
-import { ref } from "vue";
+import GroupListItems from "@/Components/app/GroupListItems.vue";
 
-const searchKeyword = ref("");
+import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/vue";
 </script>
 
 <template>
-    <div class="px-3 bg-white rounded border py-3">
-        <h2 class="text-xl font-bold px-3 mb-4">My Groups</h2>
-        <TextInput
-            :model-value="searchKeyword"
-            placeholder="search group"
-            class="w-full"
-        />
-        <div class="py-8 px-3">
-            <div v-if="false" class="text-gray-600 flex text-center">
-                You have not joined any group
-            </div>
-            <div v-else>
-                <GroupItem
-                    image="https://picsum.photos/100"
-                    title="Laravel Developer"
-                    description="Lorem ipsum dolor sit amet consectetur
-                                Voluptatibus, quas ipsa."
-                />
+    <div class="px-3 bg-white rounded border h-full py-3 overflow-hidden">
+        <div class="block lg:hidden">
+            <Disclosure v-slot="{ open }">
+                <DisclosureButton class="w-full">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-xl font-bold px-3">My Groups</h2>
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="currentColor"
+                            class="w-6 h-6 transition-all"
+                            :class="open ? 'rotate-90 transform' : ''"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                            />
+                        </svg>
+                    </div>
+                </DisclosureButton>
 
-                <GroupItem
-                    image="https://picsum.photos/100"
-                    title="Vue.js Developer"
-                    description="Lorem ipsum dolor sit amet consectetur
-                                Voluptatibus, quas ipsa."
-                />
-                <GroupItem
-                    image="https://picsum.photos/100"
-                    title="Laravel Developer"
-                    description="Lorem ipsum dolor sit amet consectetur
-                                Voluptatibus, quas ipsa."
-                />
+                <DisclosurePanel>
+                    <GroupListItems />
+                </DisclosurePanel>
+            </Disclosure>
+        </div>
 
-                <GroupItem
-                    image="https://picsum.photos/100"
-                    title="Vue.js Developer"
-                    description="Lorem ipsum dolor sit amet consectetur
-                                Voluptatibus, quas ipsa."
-                />
-                <GroupItem
-                    image="https://picsum.photos/100"
-                    title="Laravel Developer"
-                    description="Lorem ipsum dolor sit amet consectetur
-                                Voluptatibus, quas ipsa."
-                />
-
-                <GroupItem
-                    image="https://picsum.photos/100"
-                    title="Vue.js Developer"
-                    description="Lorem ipsum dolor sit amet consectetur
-                                Voluptatibus, quas ipsa."
-                />
-                <GroupItem
-                    image="https://picsum.photos/100"
-                    title="Laravel Developer"
-                    description="Lorem ipsum dolor sit amet consectetur
-                                Voluptatibus, quas ipsa."
-                />
-
-                <GroupItem
-                    image="https://picsum.photos/100"
-                    title="Vue.js Developer"
-                    description="Lorem ipsum dolor sit amet consectetur
-                                Voluptatibus, quas ipsa."
-                />
-            </div>
+        <div class="h-full flex-col overflow-hidden hidden lg:flex">
+            <h2 class="text-xl font-bold px-3">My Groups</h2>
+            <GroupListItems />
         </div>
     </div>
 </template>
