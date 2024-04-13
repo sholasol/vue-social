@@ -64,16 +64,36 @@ function submitCoverImage() {
     console.log(ImagesForm.cover);
     ImagesForm.post(route("profile.updateCover"), {
         onSuccess: (user) => {
-            console.log(user);
-
             cancelCoverImage();
 
             setTimeout(() => {
                 showNotification.value = false;
+
+                // Reload the page after 3 seconds
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
             }, 3000);
+
+            //window.location.reload();
         },
     });
 }
+
+// function submitCoverImage() {
+//     console.log(ImagesForm.cover);
+//     ImagesForm.post(route("profile.updateCover"), {
+//         onSuccess: (user) => {
+//             console.log(user);
+
+//             cancelCoverImage();
+
+//             setTimeout(() => {
+//                 showNotification.value = false;
+//             }, 3000);
+//         },
+//     });
+// }
 </script>
 
 <template>
@@ -84,6 +104,12 @@ function submitCoverImage() {
                 class="my-2 py-2 px-3 font-medium text-sm bg-emerald-500 text-white"
             >
                 Cover image has been successfully updated.
+            </div>
+            <div
+                v-if="errors.cover"
+                class="my-2 py-2 px-3 font-medium text-sm bg-red-500 text-white"
+            >
+                {{ errors.cover }}
             </div>
             <div class="group relative bg-white">
                 <img
