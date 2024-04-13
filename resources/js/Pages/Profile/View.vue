@@ -2,86 +2,153 @@
 import { usePage } from "@inertiajs/vue3";
 const user = usePage().props.auth.user;
 
-import { ref } from "vue";
+import { defineProps, ref } from "vue";
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import TabItem from "@/Pages/Profile/Partials/TabItem.vue";
 import Edit from "@/Pages/Profile/Edit.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import { computed } from "vue";
+import { XMarkIcon, CheckCircleIcon } from "@heroicons/vue/24/solid";
+
+// import { reactive } from "vue";
+// import { router } from "@inertiajs/vue3";
+import { useForm } from "@inertiajs/vue3";
+
+const ImagesForm = useForm({
+    cover: null,
+    avatar: null,
+});
+
+const authUser = usePage().props.auth.user;
+
+const coverImageSrc = ref("");
+const showNotification = ref(true);
+//let imagesForm = null;
+
+const isMyProfile = computed(() => authUser && authUser.id === user.id);
 
 defineProps({
+    errors: Object,
+
     mustVerifyEmail: {
         type: Boolean,
     },
     status: {
         type: String,
     },
+    user: {
+        type: Object,
+    },
 });
 
-const categories = ref({
-    Recent: [
-        {
-            id: 1,
-            title: "Does drinking coffee make you smarter?",
-            date: "5h ago",
-            commentCount: 5,
-            shareCount: 2,
+function onCoverChange(event) {
+    ImagesForm.cover = event.target.files[0];
+
+    if (ImagesForm.cover) {
+        const reader = new FileReader();
+
+        reader.onload = () => {
+            coverImageSrc.value = reader.result;
+        };
+        reader.readAsDataURL(ImagesForm.cover);
+    }
+}
+
+function cancelCoverImage() {
+    ImagesForm.cover = null;
+    coverImageSrc.value = null;
+}
+
+function submitCoverImage() {
+    console.log(ImagesForm.cover);
+    ImagesForm.post(route("profile.updateCover"), {
+        onSuccess: (user) => {
+            console.log(user);
+
+            cancelCoverImage();
+
+            setTimeout(() => {
+                showNotification.value = false;
+            }, 3000);
         },
-        {
-            id: 2,
-            title: "So you've bought coffee... now what?",
-            date: "2h ago",
-            commentCount: 3,
-            shareCount: 2,
-        },
-    ],
-    Popular: [
-        {
-            id: 1,
-            title: "Is tech making coffee better or worse?",
-            date: "Jan 7",
-            commentCount: 29,
-            shareCount: 16,
-        },
-        {
-            id: 2,
-            title: "The most innovative things happening in coffee",
-            date: "Mar 19",
-            commentCount: 24,
-            shareCount: 12,
-        },
-    ],
-    Trending: [
-        {
-            id: 1,
-            title: "Ask Me Anything: 10 answers to your questions about coffee",
-            date: "2d ago",
-            commentCount: 9,
-            shareCount: 5,
-        },
-        {
-            id: 2,
-            title: "The worst advice we've ever heard about coffee",
-            date: "4d ago",
-            commentCount: 1,
-            shareCount: 2,
-        },
-    ],
-});
+    });
+}
 </script>
 
 <template>
     <AuthenticatedLayout>
         <div class="container mx-auto h-full overflow-auto">
-            <div class="relative bg-white">
+            <div
+                v-show="showNotification && status === 'cover-image-updated'"
+                class="my-2 py-2 px-3 font-medium text-sm bg-emerald-500 text-white"
+            >
+                Cover image has been successfully updated.
+            </div>
+            <div class="group relative bg-white">
                 <img
-                    src="https://images.pexels.com/photos/373883/pexels-photo-373883.jpeg"
+                    :src="
+                        coverImageSrc ||
+                        '/storage/' + user.cover_path ||
+                        '/img/cover.jpg'
+                    "
                     alt=""
-                    class="w-full h-[250px] object-cover"
+                    class="w-full h-[300px] object-cover"
                 />
+                <div class="absolute top-2 right-2">
+                    <button
+                        v-if="!coverImageSrc"
+                        class="bg-gray-50 hover:bg-gray-100 text-gray-800 py-1 px-2 text-xs flex items-center opacity-0 group-hover:opacity-100"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="currentColor"
+                            class="w-3 h-3 mr-1"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"
+                            />
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z"
+                            />
+                        </svg>
+
+                        Update
+                        <input
+                            type="file"
+                            class="absolute left-0 top-0 bottom-0 right-0 opacity-0"
+                            @change="onCoverChange"
+                        />
+                    </button>
+                    <div
+                        v-else
+                        class="flex gap-2 bg-white p-2 group-hover:opacity-100 opacity-0"
+                    >
+                        <button
+                            @click="cancelCoverImage"
+                            class="bg-gray-50 hover:bg-gray-100 text-gray-800 py-1 px-2 text-xs flex items-center"
+                        >
+                            <XMarkIcon class="h-3 w-3 mr-2 text-red-800" />
+                            Cancel
+                        </button>
+                        <button
+                            @click="submitCoverImage"
+                            class="bg-gray-800 hover:bg-gray-900 text-gray-100 py-1 px-2 text-xs flex items-center"
+                        >
+                            <CheckCircleIcon class="h-3 w-3 mr-2" /> Submit
+                        </button>
+                    </div>
+                </div>
                 <div class="flex">
                     <img
-                        src="https://www.pngall.com/wp-content/uploads/12/Avatar-Profile-PNG-Photos.png"
+                        src="/img/avatar.png"
                         alt=""
                         class="ml-[48px] w-[128px] h-[128px] -mt-[60px]"
                     />
@@ -91,7 +158,7 @@ const categories = ref({
                         <h2 class="font-bold text-lg">
                             {{ user.name }}
                         </h2>
-                        <PrimaryButton>
+                        <PrimaryButton v-if="isMyProfile">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
@@ -115,7 +182,11 @@ const categories = ref({
             <div class="border-t">
                 <TabGroup>
                     <TabList class="flex bg-white">
-                        <Tab v-slot="{ selected }" as="template">
+                        <Tab
+                            v-if="isMyProfile"
+                            v-slot="{ selected }"
+                            as="template"
+                        >
                             <TabItem text="About" :selected="selected" />
                         </Tab>
                         <Tab v-slot="{ selected }" as="template">
@@ -133,7 +204,10 @@ const categories = ref({
                     </TabList>
 
                     <TabPanels class="mt-2">
-                        <TabPanel class="bg-white p-3 shadow">
+                        <TabPanel
+                            v-if="isMyProfile"
+                            class="bg-white p-3 shadow"
+                        >
                             <Edit
                                 :must-verify-email="mustVerifyEmail"
                                 :status="status"
