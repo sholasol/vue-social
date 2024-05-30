@@ -152,7 +152,6 @@ function submitAvatarImage() {
             >
                 {{ success }}
             </div>
-
             <div
                 v-if="errors.cover"
                 class="my-2 py-2 px-3 font-medium text-sm bg-red-500 text-white"
